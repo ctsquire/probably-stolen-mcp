@@ -68,7 +68,7 @@ async function readMetadata(path: string): Promise<{ studio: string | null; game
 }
 
 async function readGameAchievements(path: string): Promise<AchievementDefinition[]> {
-  const json: unknown = JSON.parse((await readFile(path, 'utf8')).replace(/^﻿/, ''));
+  const json: unknown = JSON.parse((await readFile(path, 'utf8')).replace(/^\uFEFF/, ''));
   return gameAchievementSchema.parse(json).map(({ name, displayName, description, hidden }) => ({
     id: name, name: displayName, description, hidden: Boolean(hidden),
   }));
