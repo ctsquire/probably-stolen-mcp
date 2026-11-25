@@ -1,6 +1,6 @@
 {
   "name": "probably-stolen-mcp",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "private": true,
   "description": "MCP reference and local in-game controls for Probably Stolen",
   "license": "MIT",

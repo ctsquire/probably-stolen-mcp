@@ -30,6 +30,9 @@ const cases: Case[] = [
   ['list_live_inventory', { query: 'ras' }, 'inventory', { query: 'ras', limit: 35, offset: 0 }],
   ['move_item', { shopSession, inventorySnapshot, itemId: 1, destinationId: 3 }, 'move_item'],
   ['move_item', { shopSession, inventorySnapshot, itemId: 1, destinationId: 3, quantity: 2 }, 'move_item'],
+  ['use_item_on_item', { shopSession, inventorySnapshot, itemId: 9, targetItemId: 16 }, 'use_item_on_item'],
+  ['scratch_ticket', { shopSession, inventorySnapshot, itemId: 7 }, 'scratch_ticket', { shopSession, inventorySnapshot, itemId: 7, redeem: true }],
+  ['scratch_ticket', { shopSession, inventorySnapshot, itemId: 7, redeem: false }, 'scratch_ticket'],
   ['call_next_customer', { shopSession }, 'call_next'],
   ['dismiss_current_customer', customer, 'dismiss'],
   ['shop_day_action', { shopSession, action: 'sleep' }, 'sleep', { shopSession }],
@@ -88,6 +91,7 @@ describe('game tools', () => {
       ['phone_action', { shopSession, action: 'list', number: 1 }],
       ['wild_network_action', { shopSession, action: 'buy', upgradeId: 'example' }],
       ['wild_network_action', { shopSession, action: 'list', expectedPrice: 5 }],
+      ['use_item_on_item', { shopSession, inventorySnapshot, itemId: 4, targetItemId: 4 }],
     ];
     for (const [name, args] of refusals) {
       const result = plan(name, args);
@@ -117,7 +121,7 @@ describe('game tools', () => {
   it('marks read-only and destructive tools for clients', () => {
     assert.equal(tool('get_live_shop').annotations.readOnlyHint, true);
     assert.equal(tool('list_live_inventory').annotations.readOnlyHint, true);
-    for (const name of ['quit_game', 'dismiss_current_customer', 'shotgun_action', 'report_current_customer']) {
+    for (const name of ['quit_game', 'dismiss_current_customer', 'shotgun_action', 'report_current_customer', 'use_item_on_item', 'scratch_ticket']) {
       assert.equal(tool(name).annotations.destructiveHint, true, name);
     }
   });

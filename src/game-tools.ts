@@ -84,6 +84,36 @@ export const gameTools: GameTool[] = [
   }),
 
   defineTool({
+    name: 'use_item_on_item',
+    title: 'Use one item on another',
+    description: 'Use an owned item on another owned item, as if dropping it onto that item in the game. Examples: pour a Jug of Water into a RAS Water Tank, cut a fish with a Kitchen Knife (the first use kills, the second butchers), or fit Scrap Metal to a Recirculating Aquaculture System. Pass itemId for the item being used and targetItemId for the item it is used on, both from the latest list_live_inventory. The game refuses combinations it does not allow. Read the inventory again afterwards because item IDs change. Only call this tool when the user requests gameplay.',
+    inputSchema: {
+      shopSession: token,
+      inventorySnapshot: token,
+      itemId: rowId,
+      targetItemId: rowId,
+    },
+    annotations: destructive,
+    plan: args => args.itemId === args.targetItemId
+      ? { error: 'Choose two different items.' }
+      : send('use_item_on_item', args),
+  }),
+
+  defineTool({
+    name: 'scratch_ticket',
+    title: 'Scratch a Scratcher Ticket',
+    description: 'Scratch all three panels of an owned Scratcher Ticket, at the shop or at the Dumping Ground, using the game\'s own scratch logic (including the luck reroll when a fresh ticket is opened). A winning ticket is cashed in for its prize unless redeem is false. Pass itemId and inventorySnapshot from the latest list_live_inventory. The result says whether it won and how much. Read the inventory again afterwards because item IDs change. Only call this tool when the user requests gameplay.',
+    inputSchema: {
+      shopSession: token,
+      inventorySnapshot: token,
+      itemId: rowId,
+      redeem: z.boolean().default(true),
+    },
+    annotations: destructive,
+    plan: args => send('scratch_ticket', args),
+  }),
+
+  defineTool({
     name: 'call_next_customer',
     title: 'Call the next Probably Stolen customer',
     description: 'Call the next customer in the active shop. First use get_live_shop and pass its shopSession only if canCallNext is true. Call only when the user requests gameplay.',
