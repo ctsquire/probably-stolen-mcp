@@ -33,8 +33,10 @@ describe('bridge client', () => {
     try {
       const client = createBridgeClient({ directory: game.directory, pollMs: 5 });
       await client.send('status', { command: 'quit_game', version: 99 });
-      assert.equal(game.requests[0]?.command, 'status');
-      assert.equal(game.requests[0]?.version, 1);
+      const [request] = game.requests;
+      assert.ok(request);
+      assert.equal(request.command, 'status');
+      assert.equal(request.version, 1);
     } finally {
       await game.stop();
     }

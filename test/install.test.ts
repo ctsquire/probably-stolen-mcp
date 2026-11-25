@@ -34,7 +34,7 @@ describe('install', () => {
 
   it('recognises a complete install', async () => {
     const directory = join(root, 'complete');
-    await writeInstall(directory, `﻿${JSON.stringify(definitions)}`);
+    await writeInstall(directory, `\uFEFF${JSON.stringify(definitions)}`);
     assert.deepEqual(await openInstall(directory).info(), {
       configured: true,
       directory,
