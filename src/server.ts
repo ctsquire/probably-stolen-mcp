@@ -33,14 +33,14 @@ export function createServer({ install, wiki, bridge }: ServerDependencies): Mcp
 
   server.registerTool('get_install_info', {
     title: 'Check the local Probably Stolen install',
-    description: 'Identify the configured installation and check whether its achievement definitions are present.',
+    description: 'Identify the configured game install and the Steam folder, and report where achievement definitions will be read from.',
     inputSchema: {},
     annotations: localHints,
   }, async () => toolResult(await install.info()));
 
   server.registerTool('list_achievements', {
     title: 'Find local Probably Stolen achievements',
-    description: 'List achievement definitions from the configured game install. Search by ID, title, or description. Hidden achievements are omitted by default.',
+    description: 'List achievement definitions from Steam’s local copy of the game’s achievement schema. Search by ID, title, or description. Hidden achievements are omitted by default. These are definitions only, not unlock progress.',
     inputSchema: { query: shortText.optional(), includeHidden: z.boolean().default(false) },
     annotations: localHints,
   }, async args => toolResult(await install.achievements(args)));

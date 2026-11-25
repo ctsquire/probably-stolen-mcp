@@ -5,7 +5,7 @@ import { createServer } from './server.ts';
 import { createWiki } from './wiki.ts';
 
 const server = createServer({
-  install: openInstall(process.env.PROBABLY_STOLEN_GAME_DIR),
+  install: openInstall({ gameDirectory: process.env.PROBABLY_STOLEN_GAME_DIR }),
   wiki: createWiki(),
   bridge: createBridgeClient(),
 });
