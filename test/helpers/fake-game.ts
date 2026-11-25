@@ -27,10 +27,10 @@ export function makeBridgeDirectory(): Promise<string> {
 export async function startFakeGame(respond: Responder = () => ({ ok: true })): Promise<FakeGame> {
   const directory = await makeBridgeDirectory();
   const requests: GameRequest[] = [];
-  let running = true;
+  const stopped = new AbortController();
 
   const worker = (async () => {
-    while (running) {
+    while (!stopped.signal.aborted) {
       for (const file of await readdir(directory)) {
         const id = requestFile.exec(file)?.[1];
         if (id === undefined) continue;
@@ -51,7 +51,7 @@ export async function startFakeGame(respond: Responder = () => ({ ok: true })): 
     directory,
     requests,
     async stop() {
-      running = false;
+      stopped.abort();
       await worker;
       await rm(directory, { recursive: true, force: true });
     },
