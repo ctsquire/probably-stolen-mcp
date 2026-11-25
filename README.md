@@ -6,8 +6,8 @@ A local companion for [Probably Stolen – Cyberpunk Shopkeeper Sim](https://sto
 | --- | --- |
 | `search_wiki` | Finds items, characters, mechanics, and guides on the [Probably Stolen Wiki](https://probablystolen.wiki.gg/). |
 | `get_wiki_page` | Returns item facts, section links, excerpts, and sample table rows. Pass `section` to focus on a heading such as `Obtaining`. |
-| `get_install_info` | Checks the Windows install directory and whether its achievement definitions are available. |
-| `list_achievements` | Reads achievement definitions from the local install. Set `includeHidden` to `true` to allow hidden entries. |
+| `get_install_info` | Checks the configured game folder, finds Steam, and reports where achievement definitions will be read from. |
+| `list_achievements` | Reads achievement definitions from Steam’s local cache. Set `includeHidden` to `true` to allow hidden entries. |
 | `get_live_shop` | Reads day, credits, customer, available actions, and after-hours status, including departure blockers and search risks. |
 | `call_next_customer` | Calls a customer when the game allows it. Requires the active shop token from `get_live_shop`. |
 | `dismiss_current_customer` | Dismisses the customer at the counter. Requires the shop and customer tokens from `get_live_shop`. |
@@ -31,7 +31,9 @@ A local companion for [Probably Stolen – Cyberpunk Shopkeeper Sim](https://sto
 | `return_to_main_menu` | Returns from the game's ending screen to the main menu. |
 | `quit_game` | Exits the loaded game on explicit request. Changes since the last save are discarded. |
 
-Wiki tools need internet access and may describe a different game build. Local tools use the directory you configure. Achievement results describe unlock requirements and contain no player progress.
+Wiki tools need internet access and may describe a different game build. Achievement results describe unlock requirements and contain no player progress.
+
+Achievements come from the schema Steam caches at `<Steam>\appcache\stats\UserGameStatsSchema_4348910.bin`. Steam downloads it the first time you launch the game through Steam. The server finds Steam through the registry and the usual install folders; set `STEAM_DIR` if yours is elsewhere. If the schema is missing, it falls back to a `steam_settings\achievements.json` file in the game folder when one exists.
 
 Use the included version 11 bridge for the current tool set. `get_live_shop` reports the running version. Replace the installed bridge DLL and restart the game after upgrading.
 
@@ -86,9 +88,25 @@ codex mcp add probably-stolen --env "PROBABLY_STOLEN_GAME_DIR=$gameDir" -- $node
 
 Try asking “Use the Probably Stolen MCP to find where I can buy a Water Purifier” or “Show me the achievements in my install.”
 
+## Connect to Claude Desktop
+
+Run `npm install` as above, then add the server to `claude_desktop_config.json` (**Settings → Developer → Edit Config** in Claude Desktop) and restart Claude. Use your own paths; backslashes must be doubled in JSON.
+
+```json
+{
+  "mcpServers": {
+    "probably-stolen": {
+      "command": "node",
+      "args": ["C:\\path\\to\\probably-stolen-mcp\\dist\\main.js"],
+      "env": { "PROBABLY_STOLEN_GAME_DIR": "C:\\path\\to\\Probably Stolen" }
+    }
+  }
+}
+```
+
 ## Use another client or move the server
 
-On a fresh copy, install Node.js 22.18 or newer and run `npm install` from the project folder. Configure your client to launch `node` with the absolute path to `dist/main.js` as its sole argument. Set `PROBABLY_STOLEN_GAME_DIR` in the server environment to the folder containing `Probably Stolen.exe`. Leave it unset for wiki access alone.
+On a fresh copy, install Node.js 22.18 or newer and run `npm install` from the project folder. Configure your client to launch `node` with the absolute path to `dist/main.js` as its sole argument. Set `PROBABLY_STOLEN_GAME_DIR` in the server environment to the folder containing `Probably Stolen.exe`. Leave it unset if you only need the wiki and achievements. Set `STEAM_DIR` if Steam is not in its usual folder.
 
 The server finds the bridge's request folder under `%USERPROFILE%\AppData\LocalLow\Questing Goose Studio\Probably Stolen\ModData`. Set `PROBABLY_STOLEN_BRIDGE_DIR` to use a different folder, for example when the game runs under Proton.
 
@@ -118,3 +136,9 @@ Rebuild the game mod on Windows from your installed game assemblies. Run the fol
 ```powershell
 .\game-bridge\build.ps1 -GameDirectory $gameDir
 ```
+
+Change dependencies in `package.json`, then run **Update lockfile** from the repository's Actions tab to refresh `package-lock.json`.
+
+## License
+
+MIT. See [LICENSE](LICENSE). Probably Stolen and its assets belong to their respective owners; this project ships no game files.
