@@ -182,6 +182,98 @@ namespace ProbablyStolenMcpBridge
             reply.message = "Used " + source.Name + " on " + target.Name + ". Read the live inventory or tank to check the result.";
         }
 
+        /// <summary>
+        /// Scratches every panel of an owned Scratcher Ticket the way the scratch window does
+        /// (ScratcherUIManager.OpenUI, then OnScratchComplete for each slot), and optionally cashes a
+        /// winning ticket in the way using a fully scratched ticket does.
+        /// </summary>
+        internal void Scratch(BridgeRequest request, BridgeReply reply, PlayerStore store)
+        {
+            if (snapshot == null || request.inventorySnapshot != snapshot.Token)
+            {
+                reply.message = "Read the live inventory again before scratching a ticket.";
+                return;
+            }
+
+            if ((ModHelper.IsOutsideStore() && ModHelper.GetCurrentAfterhourLocationId() != AfterhoursBridge.DumpingGround) ||
+                store.lockAllFlag > 0 || store.lockAllInventoryFlag > 0 ||
+                (ItemMouseDragHandler.current != null && ItemMouseDragHandler.current.IsDraggingItem))
+            {
+                reply.message = "The game is not ready to scratch a ticket at the current location or during this interaction.";
+                return;
+            }
+
+            var entry = snapshot.Items.Find(candidate => candidate.Id == request.itemId);
+            if (entry == null)
+            {
+                reply.message = "Choose a Scratcher Ticket from the live inventory.";
+                return;
+            }
+
+            var live = Capture();
+            if (!IsStillPresent(live, entry))
+            {
+                Invalidate();
+                reply.message = "The ticket changed. Read the live inventory again.";
+                return;
+            }
+
+            var ticket = entry.Item;
+            reply.itemName = entry.Name;
+            if (!ticket.IsTag("SCRATCHER_TAG") || ticket.unitCount != 1)
+            {
+                reply.message = entry.Name + " is not a single Scratcher Ticket.";
+                return;
+            }
+
+            Invalidate();
+            if (!ScratcherHelper.IsFullyScratched(ticket))
+            {
+                // Opening the ticket rerolls an unscratched ticket for the player's current luck.
+                ScratcherHelper.TryRerollForBetterLuck(ticket);
+                for (int slot = 1; slot <= 3; slot++)
+                {
+                    if (ticket.GetTagReadonly("SCRATCHER_STATE" + slot).GetInt() != 1)
+                        ScratcherHelper.MarkSymbolScratched(ticket, slot);
+                }
+            }
+
+            var window = ScratcherUIManager.Instance;
+            bool windowShowsTicket = window != null && ReferenceEquals(window.currentActiveScratcherItem, ticket) &&
+                window.ui != null && window.ui.activeSelf;
+            if (windowShowsTicket && window.scratchInputs != null)
+            {
+                foreach (var panel in window.scratchInputs)
+                    if (panel != null) panel.RevealAll();
+            }
+
+            if (!ScratcherHelper.CanRedeemPrize(ticket))
+            {
+                reply.ok = true;
+                reply.message = "Scratched " + entry.Name + ". No prize.";
+                return;
+            }
+
+            int prize = (int)ticket.unitValue;
+            if (!request.redeem)
+            {
+                reply.ok = true;
+                reply.message = "Scratched " + entry.Name + ". It won " + prize + " credits; it has not been cashed in yet.";
+                return;
+            }
+
+            if (windowShowsTicket) window.CloseUI();
+            if (!ScratcherHelper.TryRedeemPrize(ticket))
+            {
+                reply.ok = true;
+                reply.message = "Scratched " + entry.Name + ". It won " + prize + " credits, but the game did not cash it in.";
+                return;
+            }
+
+            reply.ok = true;
+            reply.message = "Scratched " + entry.Name + " and cashed in " + prize + " credits.";
+        }
+
         private static bool IsStillPresent(InventorySnapshot live, ItemEntry entry)
         {
             return live.Items.Exists(candidate => ReferenceEquals(candidate.Item, entry.Item) &&

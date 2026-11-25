@@ -31,6 +31,8 @@ const cases: Case[] = [
   ['move_item', { shopSession, inventorySnapshot, itemId: 1, destinationId: 3 }, 'move_item'],
   ['move_item', { shopSession, inventorySnapshot, itemId: 1, destinationId: 3, quantity: 2 }, 'move_item'],
   ['use_item_on_item', { shopSession, inventorySnapshot, itemId: 9, targetItemId: 16 }, 'use_item_on_item'],
+  ['scratch_ticket', { shopSession, inventorySnapshot, itemId: 7 }, 'scratch_ticket', { shopSession, inventorySnapshot, itemId: 7, redeem: true }],
+  ['scratch_ticket', { shopSession, inventorySnapshot, itemId: 7, redeem: false }, 'scratch_ticket'],
   ['call_next_customer', { shopSession }, 'call_next'],
   ['dismiss_current_customer', customer, 'dismiss'],
   ['shop_day_action', { shopSession, action: 'sleep' }, 'sleep', { shopSession }],
@@ -119,7 +121,7 @@ describe('game tools', () => {
   it('marks read-only and destructive tools for clients', () => {
     assert.equal(tool('get_live_shop').annotations.readOnlyHint, true);
     assert.equal(tool('list_live_inventory').annotations.readOnlyHint, true);
-    for (const name of ['quit_game', 'dismiss_current_customer', 'shotgun_action', 'report_current_customer', 'use_item_on_item']) {
+    for (const name of ['quit_game', 'dismiss_current_customer', 'shotgun_action', 'report_current_customer', 'use_item_on_item', 'scratch_ticket']) {
       assert.equal(tool(name).annotations.destructiveHint, true, name);
     }
   });

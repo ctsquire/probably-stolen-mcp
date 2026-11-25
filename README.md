@@ -16,6 +16,7 @@ A local companion for [Probably Stolen – Cyberpunk Shopkeeper Sim](https://sto
 | `list_live_inventory` | Lists owned shop items and containers, or ground loot, pockets, and backpack storage at the Dumping Ground. |
 | `move_item` | Moves a whole item stack or a specified quantity to a different listed container when a legal slot is available. |
 | `use_item_on_item` | Uses one owned item on another, like dropping it onto that item: pours a water jug into a tank, cuts a fish with a blade, or fits an upgrade part. |
+| `scratch_ticket` | Scratches all panels of an owned Scratcher Ticket at the shop or Dumping Ground and cashes in a win unless told not to. |
 | `shop_day_action` | Closes the morning report, opens or closes the shop, or sleeps and saves. |
 | `complete_trade` | Completes the currently negotiated purchase or sale, guarded by customer token and expected price. |
 | `select_customer_offer` | Moves a seller’s offered item to the scale or selects an item already on the scale. |
@@ -62,6 +63,10 @@ For other outings, check `canVisitCommissary` or `canVisitDoctor`. The matching 
 List `ras` in the live inventory and use the selected Recirculating Aquaculture System's item ID and snapshot with `fish_tank_action`. The `inspect` action reads tank status. The `open` and `close` actions update the actual window and report its visibility. One inventory snapshot can identify several tanks until another inventory listing or item move replaces it.
 
 To fill a tank, list the inventory and call `use_item_on_item` with a Jug of Water as `itemId` and the tank's **RAS Water Tank** as `targetItemId`. The game pours as much as fits. Inspect the tank afterwards to read the new water volume. The same tool cuts a fish with a blade (the first use kills, the second butchers) and fits Scrap Metal, Metal Ingots, or Common Electronic Parts to the system as upgrades.
+
+## Scratch a ticket
+
+List `scratcher` in the live inventory and call `scratch_ticket` with the ticket's item ID and snapshot. It works at the shop or at the Dumping Ground, so a ticket can be scratched before deciding whether it is worth carrying home. A fresh ticket gets the same luck reroll as opening it by hand. A winning ticket is cashed in straight away unless `redeem` is `false`.
 
 ## Use the alarm or shotgun
 
