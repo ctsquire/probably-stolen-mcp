@@ -35,7 +35,7 @@ namespace ProbablyStolenMcpBridge
     {
         private const string ModId = "probably_stolen_mcp_bridge";
         private const int ProtocolVersion = 1;
-        private const int BridgeVersion = 11;
+        private const int BridgeVersion = 12;
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         internal ModLog Log;
         private float nextPoll;
@@ -321,6 +321,11 @@ namespace ProbablyStolenMcpBridge
                     inventory.Move(request, reply, store);
                     return reply;
 
+                case "use_item_on_item":
+                    inventory.UseOn(request, reply, store);
+                    if (reply.ok) FillShopState(reply, store);
+                    return reply;
+
                 case "select_outing_backpack":
                     inventory.SelectBackpack(request, reply, store);
                     if (reply.ok) FillShopState(reply, store);
@@ -441,6 +446,7 @@ namespace ProbablyStolenMcpBridge
         public string inventorySnapshot;
         public int itemId;
         public int destinationId;
+        public int targetItemId;
         public int quantity;
         public long expectedPrice;
         public int slot;
