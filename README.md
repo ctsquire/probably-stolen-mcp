@@ -74,12 +74,12 @@ Use `phone_action` to list answering contacts and dial a number. After calling J
 
 ## Connect to Codex
 
-Install Node.js 22 or newer and run these commands in PowerShell from the cloned repository. Provide the folder containing `Probably Stolen.exe`, then start a new Codex session after registration. [Codex MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
+Install Node.js 22.18 or newer and run these commands in PowerShell from the cloned repository. `npm install` also compiles the TypeScript sources into `dist`. Provide the folder containing `Probably Stolen.exe`, then start a new Codex session after registration. [Codex MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
 
 ```powershell
-npm ci
+npm install
 $gameDir = (Resolve-Path -LiteralPath (Read-Host 'Probably Stolen install directory')).Path
-$serverPath = (Resolve-Path -LiteralPath 'server.mjs').Path
+$serverPath = (Resolve-Path -LiteralPath 'dist\main.js').Path
 $nodePath = (Get-Command node.exe).Source
 codex mcp add probably-stolen --env "PROBABLY_STOLEN_GAME_DIR=$gameDir" -- $nodePath $serverPath
 ```
@@ -88,11 +88,32 @@ Try asking “Use the Probably Stolen MCP to find where I can buy a Water Purifi
 
 ## Use another client or move the server
 
-On a fresh copy, install Node.js 22 or newer and run `npm ci` from the project folder. Configure your client to launch `node` with the absolute path to `server.mjs` as its sole argument. Set `PROBABLY_STOLEN_GAME_DIR` in the server environment to the folder containing `Probably Stolen.exe`. Leave it unset for wiki access alone.
+On a fresh copy, install Node.js 22.18 or newer and run `npm install` from the project folder. Configure your client to launch `node` with the absolute path to `dist/main.js` as its sole argument. Set `PROBABLY_STOLEN_GAME_DIR` in the server environment to the folder containing `Probably Stolen.exe`. Leave it unset for wiki access alone.
 
-## Build and test
+The server finds the bridge's request folder under `%USERPROFILE%\AppData\LocalLow\Questing Goose Studio\Probably Stolen\ModData`. Set `PROBABLY_STOLEN_BRIDGE_DIR` to use a different folder, for example when the game runs under Proton.
 
-Run `npm test` to verify the MCP tool schemas, request mapping, and cleanup without running Probably Stolen. Rebuild the game mod on Windows from your installed game assemblies. Run the following from the repository root with `$gameDir` set as above.
+## Develop
+
+The server is written in TypeScript (`src/`) with strict compiler settings, linted with ESLint and typescript-eslint, and tested with the Node.js test runner. GitHub Actions runs every check on each push.
+
+| Command | What it does |
+| --- | --- |
+| `npm run build` | Compiles `src` into `dist`. |
+| `npm run typecheck` | Type-checks the sources and tests. |
+| `npm run lint` | Lints with the strict type-checked rule set. |
+| `npm test` | Runs the unit tests and an in-memory MCP session against a fake game bridge. Probably Stolen does not need to be running. |
+| `npm run check` | Runs the type check, lint, and tests together. |
+
+| Module | Responsibility |
+| --- | --- |
+| `src/main.ts` | Entry point: wires real dependencies and serves over stdio. |
+| `src/server.ts` | Registers every MCP tool. |
+| `src/game-tools.ts` | Live tool schemas and their mapping to bridge commands. |
+| `src/bridge-client.ts` | File-based request queue shared with the game mod. |
+| `src/wiki.ts` | Wiki search and page parsing. |
+| `src/install.ts` | Local install and achievement lookups. |
+
+Rebuild the game mod on Windows from your installed game assemblies. Run the following from the repository root with `$gameDir` set as above.
 
 ```powershell
 .\game-bridge\build.ps1 -GameDirectory $gameDir

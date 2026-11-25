@@ -1,19 +1,33 @@
 {
   "name": "probably-stolen-mcp",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "MCP reference and local in-game controls for Probably Stolen",
   "type": "module",
+  "main": "dist/main.js",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.18"
   },
   "scripts": {
-    "start": "node server.mjs",
-    "test": "node --test"
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "check": "npm run typecheck && npm run lint && npm test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.2",
     "cheerio": "1.2.0",
     "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.13.14",
+    "domhandler": "^5.0.3",
+    "eslint": "^10.1.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.74.0"
   }
 }
