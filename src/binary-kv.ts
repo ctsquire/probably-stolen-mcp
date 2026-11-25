@@ -31,7 +31,7 @@ export function parseBinaryKeyValues(buffer: Buffer): KeyValues {
   }
 
   function readSection(): KeyValues {
-    const section: KeyValues = new Map();
+    const section: KeyValues = new Map<string, KeyValue>();
     for (;;) {
       if (offset >= buffer.length) throw new Error('Key-value data ended before its section closed.');
       const type = buffer.readUInt8(offset);

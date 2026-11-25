@@ -86,7 +86,7 @@ export function achievementsFromSchema(schema: KeyValues, appId = steamAppId): A
       const id = child(bit, 'name');
       if (typeof id !== 'string' || !id) continue;
       const displayValue = child(bit, 'display');
-      const display: KeyValues = displayValue instanceof Map ? displayValue : new Map();
+      const display: KeyValues = displayValue instanceof Map ? displayValue : new Map<string, KeyValue>();
       achievements.push({
         id,
         name: localized(child(display, 'name'), id),
