@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Manifest>
+  <ID>probably_stolen_mcp_bridge</ID>
+  <Name>Probably Stolen MCP Bridge</Name>
+  <Author>Local MCP</Author>
+  <ModVersion>0.2.0</ModVersion>
+  <Description>Provides local MCP tools to read the shop, manage the customer queue, and move owned items between shop inventories.</Description>
+  <GameVersions>
+    <Version>1.0.0</Version>
+  </GameVersions>
+  <Prerequisites />
+  <Assemblies>
+    <Assembly>ProbablyStolenMcpBridge.dll</Assembly>
+  </Assemblies>
+  <Capabilities />
+</Manifest>
