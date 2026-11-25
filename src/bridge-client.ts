@@ -59,7 +59,7 @@ async function readReply(path: string, id: string): Promise<BridgeReply | undefi
 
   let json: unknown;
   try {
-    json = JSON.parse(raw.replace(/^﻿/, ''));
+    json = JSON.parse(raw.replace(/^\uFEFF/, ''));
   } catch {
     return undefined;
   }
@@ -102,7 +102,7 @@ export function createBridgeClient(options: BridgeClientOptions = {}): BridgeCli
         await rename(temporaryPath, requestPath);
       } catch (error) {
         if (errorCode(error) === 'ENOENT') {
-          throw new Error('The in-game bridge has not started. Enable Probably Stolen MCP Bridge in Mods and restart the game.');
+          throw new Error('The in-game bridge has not started. Enable Probably Stolen MCP Bridge in Mods and restart the game.', { cause: error });
         }
         throw error;
       }

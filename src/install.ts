@@ -90,7 +90,7 @@ export function openInstall(configuredPath: string | undefined): Install {
 
       let definitions: z.infer<typeof achievementSchema>;
       try {
-        const json: unknown = JSON.parse((await readFile(path, 'utf8')).replace(/^﻿/, ''));
+        const json: unknown = JSON.parse((await readFile(path, 'utf8')).replace(/^\uFEFF/, ''));
         definitions = achievementSchema.parse(json);
       } catch {
         throw new Error('Could not read the achievement definitions from this install.');
