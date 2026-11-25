@@ -28,7 +28,7 @@ describe('MCP server', () => {
       request.command === 'call_next' ? { ok: false, message: 'The counter is busy.' } : { ok: true, command: request.command }
     ));
     const server = createServer({
-      install: openInstall(undefined),
+      install: openInstall({ findSteam: () => Promise.resolve(undefined) }),
       wiki,
       bridge: createBridgeClient({ directory: game.directory, pollMs: 5 }),
     });
