@@ -106,7 +106,7 @@ describe('install', () => {
 
   it('falls back to an achievements.json in the game folder', async () => {
     const game = join(root, 'game-files');
-    await writeGame(game, `﻿${JSON.stringify(gameDefinitions)}`);
+    await writeGame(game, `\uFEFF${JSON.stringify(gameDefinitions)}`);
     const list = await openInstall({ gameDirectory: game, findSteam: noSteam }).achievements({ includeHidden: true });
     assert.deepEqual(list.source, { kind: 'game-files', path: join(game, gameAchievementFile) });
     assert.deepEqual(list.achievements.map(({ id, hidden }) => [id, hidden]), [['FIRST_SALE', false], ['SECRET_ENDING', true]]);
